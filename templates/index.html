@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="h4 mb-3 text-center">Build Your Skincare Routine</h1>
+                <p class="text-muted text-center mb-4">
+                    Answer a few questions and we’ll suggest a simple morning and evening routine.
+                </p>
+
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <form action="/routine" method="post">
+                    <!-- Skin Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Skin type</label>
+                        <select class="form-select" name="skin_type" required>
+                            <option value="">Choose...</option>
+                            <option value="oily">Oily</option>
+                            <option value="dry">Dry</option>
+                            <option value="combination">Combination</option>
+                            <option value="normal">Normal</option>
+                            <option value="sensitive">Sensitive</option>
+                        </select>
+                    </div>
+
+                    <!-- Concerns -->
+                    <div class="mb-3">
+                        <label class="form-label">Main concerns (choose at least one)</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="concerns" value="acne" id="acne">
+                            <label class="form-check-label" for="acne">Acne / breakouts</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="concerns" value="hyperpigmentation" id="hyperpigmentation">
+                            <label class="form-check-label" for="hyperpigmentation">Dark spots / hyperpigmentation</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="concerns" value="dehydration" id="dehydration">
+                            <label class="form-check-label" for="dehydration">Dryness / dehydration</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="concerns" value="redness" id="redness">
+                            <label class="form-check-label" for="redness">Redness / sensitivity</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="concerns" value="anti-aging" id="anti-aging">
+                            <label class="form-check-label" for="anti-aging">Fine lines / anti-aging</label>
+                        </div>
+                    </div>
+
+                    <!-- Preferences -->
+                    <div class="mb-3">
+                        <label class="form-label">Preferences</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="fragrance_free" id="fragrance_free">
+                            <label class="form-check-label" for="fragrance_free">Fragrance-free only</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        Generate My Routine
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
