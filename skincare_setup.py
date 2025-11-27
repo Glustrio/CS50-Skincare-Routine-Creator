@@ -101,10 +101,22 @@ product_ingredients_df.to_sql(
 
 with conn:
     conn.execute("""
-        CREATE TABLE users (
+        CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL
+        );
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS favorites (
+            user_id INTEGER,
+            product_id INTEGER
+        );
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS routine (
+            user_id INTEGER,
+            product_id INTEGER
         );
     """)
 
