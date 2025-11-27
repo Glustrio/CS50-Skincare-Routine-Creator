@@ -29,6 +29,7 @@ def after_request(response):
 
 @app.route("/")
 @login_required
+@login_required
 def index():
     return render_template("apology.html")
 
