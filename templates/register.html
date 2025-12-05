@@ -12,9 +12,19 @@
         <div class="mb-3">
             <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password">
         </div>
-        </div>
         <div class="mb-3">
             <input class="form-control mx-auto w-auto" name="confirmation" placeholder="Confirm Password" type="password">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Skin type</label>
+            <select class="form-select form-select-sm mx-auto w-auto" name="skintype" required>
+                <option value="">Choose...</option>
+                <option value="oily">Oily</option>
+                <option value="dry">Dry</option>
+                <option value="combination">Combination</option>
+                <option value="normal">Normal</option>
+                <option value="sensitive">Sensitive</option>
+            </select>
         </div>
         <button class="btn btn-primary" type="submit">Register</button>
     </form>
