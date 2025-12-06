@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search Products
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h4 mb-4 text-center">🔍 Search Skincare Products</h1>
+                    
+                    <form action="/search" method="post">
+                        <div class="row g-3">
+                            <!-- Search Query -->
+                            <div class="col-md-12">
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="query" 
+                                       placeholder="Search by product name (e.g., 'vitamin c serum')"
+                                       value="{{ query if query else '' }}">
+                            </div>
+                            
+                            <!-- Product Type Filter -->
+                            <div class="col-md-6">
+                                <select class="form-select" name="product_type">
+                                    <option value="">All Product Types</option>
+                                    {% if product_types %}
+                                        {% for type in product_types %}
+                                        <option value="{{ type.product_type }}">{{ type.product_type }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            
+                            <!-- Max Price Filter -->
+                            <div class="col-md-6">
+                                <input type="number" 
+                                       class="form-control" 
+                                       name="max_price" 
+                                       placeholder="Max price (USD)" 
+                                       step="0.01" 
+                                       min="0">
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    {% if results is defined %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">
+                        Search Results
+                        <span class="badge bg-primary">{{ results|length }} products</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {% if results %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Type</th>
+                                        <th>Price</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in results %}
+                                    <tr>
+                                        <td>
+                                            <a href="/product/{{ product.id }}" class="text-decoration-none">
+                                                {{ product.product_name }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ product.product_type }}</span>
+                                        </td>
+                                        <td>${{ "%.2f"|format(product.price_usd) }}</td>
+                                        <td>
+                                            <form action="/favorites" method="Post" style="display: inline;">
+                                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                                <input type="hidden" name="action" value="add">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    ❤️ Add to Favorites
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-muted">No products found matching your criteria.</p>
+                            <p class="text-muted">Try different search terms or filters.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

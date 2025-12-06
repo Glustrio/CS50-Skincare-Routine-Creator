@@ -1,0 +1,153 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Your Personalized Routine
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h1 class="h3 mb-3">✨ Your Personalized Skincare Routine</h1>
+                    <p class="text-muted">
+                        For <strong>{{ skin_type }}</strong> skin
+                        {% if concerns %}
+                            targeting: <strong>{{ concerns|join(', ') }}</strong>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form action="/save_routine" method="post">
+        <div class="row">
+            <!-- Morning Routine -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-warning bg-opacity-10">
+                        <h2 class="h5 mb-0">☀️ Morning Routine</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if routine.morning %}
+                            <ol class="list-group list-group-numbered">
+                                {% for product in routine.morning %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="ms-2 me-auto">
+                                            <div class="fw-bold">
+                                                <a href="/product/{{ product.id }}" class="text-decoration-none">
+                                                    {{ product.product_name }}
+                                                </a>
+                                            </div>
+                                            <small class="text-muted">{{ product.product_type }}</small>
+                                            <br>
+                                            <small class="text-success">
+                                                Match: {{ product.match_score }} points
+                                                {% if product.good_ingredients %}
+                                                    ({{ product.good_ingredients[:3]|join(', ') }}{% if product.good_ingredients|length > 3 %}...{% endif %})
+                                                {% endif %}
+                                            </small>
+                                            <input type="hidden" name="product_ids" value="{{ product.id }}">
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">
+                                            ${{ "%.2f"|format(product.price_usd) }}
+                                        </span>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ol>
+                        {% else %}
+                            <p class="text-muted text-center py-4">
+                                No suitable products found for morning routine.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evening Routine -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-info bg-opacity-10">
+                        <h2 class="h5 mb-0">🌙 Evening Routine</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if routine.evening %}
+                            <ol class="list-group list-group-numbered">
+                                {% for product in routine.evening %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="ms-2 me-auto">
+                                            <div class="fw-bold">
+                                                <a href="/product/{{ product.id }}" class="text-decoration-none">
+                                                    {{ product.product_name }}
+                                                </a>
+                                            </div>
+                                            <small class="text-muted">{{ product.product_type }}</small>
+                                            <br>
+                                            <small class="text-success">
+                                                Match: {{ product.match_score }} points
+                                                {% if product.good_ingredients %}
+                                                    ({{ product.good_ingredients[:3]|join(', ') }}{% if product.good_ingredients|length > 3 %}...{% endif %})
+                                                {% endif %}
+                                            </small>
+                                            <input type="hidden" name="product_ids" value="{{ product.id }}">
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">
+                                            ${{ "%.2f"|format(product.price_usd) }}
+                                        </span>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ol>
+                        {% else %}
+                            <p class="text-muted text-center py-4">
+                                No suitable products found for evening routine.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <button type="submit" class="btn btn-success btn-lg me-2">
+                            Save This Routine
+                        </button>
+                        <a href="/preset" class="btn btn-outline-secondary btn-lg">
+                            🔄 Generate New Routine 😇
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tips -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h3 class="h6 mb-0">💡 How to Use This Routine</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Follow the order listed because it matters!!!</li>
+                        <li>Wait 36-70 seconds between each product for better results and absorption</li>
+                        <li>Proceed slowly with active ingredients (like retinol or acids because they are strong💪)</li>
+                        <li>Give your routine at least 4-6 weeks to see results (or lack thereof)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

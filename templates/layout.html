@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>GlowGuide</title>
+    <title>Gordon and Jacob's GlowGuide</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap CSS -->
@@ -16,10 +16,12 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-0">
 
         <div class="container">
-            <a class="navbar-brand" href="/">GlowGuide</a>
+            <a class="navbar-brand" href="/">Gordon & Jacob's GlowGuide🌟</a>
                     {% if session.get("user_id") %}
                          <ul class="navbar-nav me-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/preset">Preset Routines</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/favorites">Favorites</a></li>
+                             <li class="nav-item"><a class="nav-link" href="/search">Search</a></li>
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
@@ -40,14 +42,14 @@
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <span aria-hidden=""true">&times;</span>
+                        <span aria-hidden="true">&times;</span>
                     </button>                    
                 </div>
                 {% else %}
-                <div class="alert alert-success alter-dismissible fade show" role="alert">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <span aria-hidden=""true">&times;</span>
+                        <span aria-hidden="true">&times;</span>
                     </button>                    
                 </div>
         {% endif %}
@@ -63,4 +65,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

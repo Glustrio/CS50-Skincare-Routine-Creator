@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Favorites
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h1 class="h3 mb-2">❤️ My Favorite Products</h1>
+                    <p class="text-muted">Products you like and want to favorite just becuz 😍</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if favorites %}
+        <div class="row">
+            {% for product in favorites %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-info">{{ product.product_type }}</span>
+                            <form action="/favorites" method="post" style="display: inline;">
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <input type="hidden" name="action" value="remove">
+                                <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                                    ❌
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <h5 class="card-title">
+                            <a href="/product/{{ product.id }}" class="text-decoration-none text-dark">
+                                {{ product.product_name }}
+                            </a>
+                        </h5>
+                        
+                        <p class="card-text">
+                            <strong class="text-primary">${{ "%.2f"|format(product.price_usd) }}</strong>
+                        </p>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="/product/{{ product.id }}" class="btn btn-outline-primary btn-sm">
+                                View Details
+                            </a>
+                            {% if product.product_url %}
+                            <a href="{{ product.product_url }}" target="_blank" class="btn btn-success btn-sm">
+                                Buy Now
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Summary -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <p class="mb-0">
+                            <!-- Total favorites (length of favorites) -->
+                            <strong>Total Favorites:</strong> {{ favorites|length }} products
+                            <br>
+                            <!-- Total value (sum of price_usd) -->
+                             <!-- Personal Note: favorites|sum(attribute='price_usd') takes the sum of price_usd of favorites (which is a list of dictioinaries) -->
+                            <strong>Total Value:</strong> ${{ "%.2f"|format(favorites|sum(attribute='price_usd')) }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <h2 class="h5 text-muted mb-3">No favorites yet!</h2>
+                        <p class="text-muted">Search for products and add them to your favorites.</p>
+                        <a href="/search" class="btn btn-primary mt-3">
+                            🔍 Start Searching
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
