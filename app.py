@@ -490,3 +490,75 @@ def product_detail(product_id):
                          good_ingredients=good_ings,
                          bad_ingredients=bad_ings,
                          is_favorite=bool(is_favorite))
+
+@app.route("/resources")
+@login_required
+def resources():
+    """Show educational skincare resources"""
+    
+    # Curated list of high-quality skincare resources
+    resources = {
+        "reddit": [
+            {
+                "title": "r/SkincareAddiction - The Science of Skincare",
+                "description": "The place for all things related to skincare, with a science-based approach.",
+                "url": "https://www.reddit.com/r/SkincareAddiction/"
+            },
+            {
+                "title": "r/AsianBeauty - K-Beauty & J-Beauty Hub",
+                "description": "A place to discuss beauty brands, cosmetics, and skincare from Asia.",
+                "url": "https://www.reddit.com/r/AsianBeauty/"
+            },
+            {
+                "title": "The ScA Routine - Getting Started Guide",
+                "description": "Beginner's guide to building a skincare routine on r/SkincareAddiction.",
+                "url": "https://www.reddit.com/r/SkincareAddiction/wiki/sca_routine/"
+            }
+        ],
+        
+        "youtube": [
+            {
+                "title": "Dr. Dray",
+                "description": "Board-certified dermatologist sharing skincare tips, product reviews, and debunking myths.",
+                "url": "https://www.youtube.com/@DrDrayzday"
+            },
+            {
+                "title": "Hyram",
+                "description": "Skincare educator focusing on ingredient analysis and affordable product recommendations.",
+                "url": "https://www.youtube.com/@Hyram"
+            },
+            {
+                "title": "Lab Muffin Beauty Science",
+                "description": "Science educator & chemistry PhD focused on using science for skincare recommendations.",
+                "url": "https://www.youtube.com/@LabMuffinBeautyScience"
+            }
+        ],
+        
+        "websites": [
+            {
+                "title": "Paula's Choice Ingredient Dictionary",
+                "description": "To easily find ratings for thousands of meticulously-researched ingredients.",
+                "url": "https://www.paulaschoice.com/ingredient-dictionary"
+            },
+            {
+                "title": "The Ordinary - Layering Guide",
+                "description": "Learn how to layer products correctly to maximize effectiveness and avoiding irritation.",
+                "url": "https://theordinary.com/en-us/blog/skincare-layering-guide.html"
+            }
+        ],
+        
+        "articles": [
+            {
+                "title": "How to Choose a Sunscreen",
+                "description": "Understanding SPF, PA ratings, UVA/UVB protection, and finding the right formula for you.",
+                "url": "https://www.reddit.com/r/SkincareAddiction/wiki/sunscreen/"
+            },
+            {
+                "title": "Retinoids: A Complete Guide",
+                "description": "Learn about retinol, tretinoin, adapalene, what they do, how to use them, and side effects.",
+                "url": "https://www.reddit.com/r/SkincareAddiction/wiki/retinoids/"
+            }
+        ]
+    }
+    
+    return render_template("resources.html", resources=resources)

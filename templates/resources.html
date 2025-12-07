@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Skincare Resources
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+
+    <!-- Page header -->
+    <h1 class="h3 mb-2">Skincare Resources</h1>
+    <p class="text-muted">
+        A list of sites and channels you can use to learn more about skincare.
+    </p>
+
+    <!-- Reddit communities -->
+    <h2 class="h5 mt-4">Reddit communities</h2>
+    <ul class="list-group mb-4">
+        {% for resource in resources.reddit %}
+        <li class="list-group-item">
+            <div class="fw-semibold">{{ resource.title }}</div>
+            <p class="mb-1 text-muted">{{ resource.description }}</p>
+            <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                Visit
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- YouTube channels -->
+    <h2 class="h5 mt-4">YouTube channels</h2>
+    <ul class="list-group mb-4">
+        {% for resource in resources.youtube %}
+        <li class="list-group-item">
+            <div class="fw-semibold">{{ resource.title }}</div>
+            <p class="mb-1 text-muted">{{ resource.description }}</p>
+            <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                Open channel
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Websites & tools -->
+    <h2 class="h5 mt-4">Websites and tools</h2>
+    <ul class="list-group mb-4">
+        {% for resource in resources.websites %}
+        <li class="list-group-item">
+            <div class="fw-semibold">{{ resource.title }}</div>
+            <p class="mb-1 text-muted">{{ resource.description }}</p>
+            <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                Visit site
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Articles / guides -->
+    <h2 class="h5 mt-4">Guides and articles</h2>
+    <ul class="list-group mb-4">
+        {% for resource in resources.articles %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+                <div class="fw-semibold text-start">{{ resource.title }}</div>
+                <p class="mb-1 text-muted text-start">{{ resource.description }}</p>
+            </div>
+            <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                Read
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Disclaimer -->
+    <div class="alert alert-info mt-4">
+        <strong>Note:</strong>
+        These links are for general information only. For medical questions or serious skin
+        problems, talk to a dermatologist. What works for one person may not work for you. Also, our skincare database may be outdated and doesn't include many products. Also, always check ingredient lists and reviews before buying.
+    </div>
+
+    <!-- Simple tips -->
+    <h2 class="h5 mt-4">General tips</h2>
+    <ul>
+        <li>Start with basics: cleanser, moisturizer, and sunscreen.</li>
+        <li>Patch-test new products on a small area first.</li>
+        <li>Give products time (often 4–6 weeks) before judging them.</li>
+        <li>Pay attention to ingredient lists, not just marketing.</li>
+        <li>Everyone’s skin is different, so adjust as needed.</li>
+    </ul>
+</div>
+{% endblock %}
