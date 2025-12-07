@@ -9,10 +9,11 @@ from helpers import login_required, usd, product_has_bad_ingredient, get_good_ma
 # Configure application
 app = Flask(__name__)
 
-# Custom filter
+# Custom filter to format USD
 app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
+# Make sessions non-permanent and store them in the filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
@@ -235,6 +236,8 @@ def register():
 @login_required
 def favorites():
     """Show and manage favorite products"""
+
+    # Get user ID from session
     user_id = session["user_id"]
 
     if request.method == "POST":
@@ -252,6 +255,7 @@ def favorites():
                 "SELECT * FROM favorites WHERE user_id = ? AND product_id = ?",
                 user_id, product_id)
             
+            # If not already favorited, insert into favorites table
             if not favorite_row:
                 db.execute("INSERT INTO favorites (user_id, product_id) VALUES (?, ?)",
                           user_id, product_id)
@@ -259,6 +263,7 @@ def favorites():
             else:
                 flash("Already in favorites", "error")
         
+        # Remove product from favorites where user_id and product_id match
         elif action == "remove":
             db.execute("DELETE FROM favorites WHERE user_id = ? AND product_id = ?",
                       user_id, product_id)
@@ -280,8 +285,11 @@ def favorites():
 
 def filter_products(products, skin_type, concerns, fragrance_free):
     """Filter products based on user preferences"""
+
+    # List to hold filtered products
     filtered = []
     
+    # Evaluate each product
     for product in products:
         # Skip if has bad ingredients for skin type
         if product_has_bad_ingredient(product, skin_type):
@@ -299,6 +307,7 @@ def filter_products(products, skin_type, concerns, fragrance_free):
         # Boost score if product addresses user concerns
         if "acne" in concerns and "salicylic acid" in product["clean_ingreds"]:
             product["match_score"] += 3
+        # any() checks if any of the listed ingredients are in the product's clean ingredients
         if "hyperpigmentation" in concerns and any(ing in product["clean_ingreds"] 
             for ing in ["niacinamide", "vitamin c", "alpha arbutin"]):
             product["match_score"] += 3
@@ -308,6 +317,7 @@ def filter_products(products, skin_type, concerns, fragrance_free):
         if "dehydration" in concerns and "hyaluronic acid" in product["clean_ingreds"]:
             product["match_score"] += 3
         
+        # Add product to filtered list
         filtered.append(product)
     
     return filtered
@@ -320,6 +330,7 @@ def build_routine(products, concerns):  # <-- Add 'concerns' parameter
     am_steps = ["Cleanser", "Toner", "Serum", "Moisturiser", "SPF"]
     pm_steps = ["Cleanser", "Exfoliator", "Serum", "Treatment", "Moisturiser"]
     
+    # Initialize routine structure
     routine = {
         "morning": [],
         "evening": []
@@ -328,28 +339,31 @@ def build_routine(products, concerns):  # <-- Add 'concerns' parameter
     # Group products by type
     by_type = {}
     for p in products:
+        # Get product type
         ptype = p["product_type"]
+        # Initialize list if not exists
         if ptype not in by_type:
             by_type[ptype] = []
+        # Append product to its type list
         by_type[ptype].append(p)
     
     # Sort each type by match score
     for ptype in by_type:
+        # Key function sorts in place, reverse=True for descending order
         by_type[ptype].sort(key=lambda x: x["match_score"], reverse=True)
     
     # Build morning routine
     for step in am_steps:
+        # If we have products of this type, add the best one
         if step in by_type and by_type[step]:
             routine["morning"].append(by_type[step][0])  # Best match
     
     # Build evening routine
     for step in pm_steps:
+        # If we have products of this type, add the best one
         if step in by_type and by_type[step]:
-            # Use second-best cleanser if available (different from AM)
-            if step == "Cleanser" and len(by_type[step]) > 1:
-                routine["evening"].append(by_type[step][1])
-            else:
-                routine["evening"].append(by_type[step][0])
+            # Add best match
+            routine["evening"].append(by_type[step][0])
     
     return routine
 
@@ -357,17 +371,21 @@ def build_routine(products, concerns):  # <-- Add 'concerns' parameter
 @login_required
 def routine():
     """Generate personalized skincare routine"""
+
+    # Handle form submission
     if request.method == "POST":
+        # Get form inputs
         skin_type = request.form.get("skin_type")
         concerns = request.form.getlist("concerns")
         fragrance_free = request.form.get("fragrance_free")
         max_price_per_product = request.form.get("max_price_per_product")
         
-        # Validation
+        # Check required inputs
         if not skin_type:
             flash("Please select your skin type", "error")
             return redirect("/preset")
         
+        # Check at least one concern selected
         if not concerns:
             flash("Please select at least one concern", "error")
             return redirect("/preset")
@@ -377,6 +395,9 @@ def routine():
                   skin_type.capitalize(), session["user_id"])
         
         # Get all products with their ingredients
+        # Using GROUP_CONCAT to aggregate ingredients into a single string per product
+        # LEFT JOIN to include products without ingredients
+        # product p is alias for products table to make it easier to reference
         products = db.execute("""
             SELECT p.id, p.product_name, p.product_type, p.price_usd, p.product_url,
                    GROUP_CONCAT(i.name) as ingredients
@@ -388,25 +409,31 @@ def routine():
         
         # Convert ingredients string back to list for each product
         for product in products:
+            # Handle case where product has no ingredients
             if product["ingredients"]:
+                # Split by comma and clean up whitespace/case
                 product["clean_ingreds"] = [ing.strip().lower() 
+                                            # Split the ingredients string into a list
                                            for ing in product["ingredients"].split(",")]
             else:
+                # No ingredients listed
                 product["clean_ingreds"] = []
         
-        # NEW: Filter by price BEFORE other filtering
+        # Filter by price BEFORE other filtering
         if max_price_per_product:
+            # Convert to float for comparison
             max_price = float(max_price_per_product)
+            # Filter products exceeding max price, keep those within budget
             products = [p for p in products if p["price_usd"] <= max_price]
         
         # Filter products based on criteria
         recommended = filter_products(products, skin_type.capitalize(), 
                                      concerns, fragrance_free)
         
-        # Build routine structure
+        # Build routine structure from recommended products and concerns
         routine = build_routine(recommended, concerns)
         
-        # NEW: Calculate total cost
+        # Calculate total cost of routine for display purposes
         total_cost = 0
         for product in routine["morning"]:
             total_cost += product["price_usd"]
@@ -415,11 +442,12 @@ def routine():
             if product not in routine["morning"]:
                 total_cost += product["price_usd"]
         
+        # Render routine results template with routine and details
         return render_template("routine_results.html", 
                              routine=routine, 
                              skin_type=skin_type,
                              concerns=concerns,
-                             total_cost=total_cost)  # NEW
+                             total_cost=total_cost) 
     
     # GET request - show the form
     return redirect("/preset")
@@ -428,9 +456,11 @@ def routine():
 @login_required
 def save_routine():
     """Save the recommended routine to the user's account"""
+
     user_id = session["user_id"]
     product_ids = request.form.getlist("product_ids")
     
+    # Validate input
     if not product_ids:
         flash("There's no products to save bruh", "error")
         return redirect("/preset")
@@ -438,11 +468,10 @@ def save_routine():
     # Clear existing routine
     db.execute("DELETE FROM routine WHERE user_id = ?", user_id)
     
-    # Save new routine
+    # Save new routine products to database for the user by inserting into routine table with user_id and product_id for each product
     for product_id in product_ids:
         db.execute("INSERT INTO routine (user_id, product_id) VALUES (?, ?)",
                   user_id, product_id)
-    
     flash("Routine saved successfully!")
     return redirect("/")
 
@@ -450,14 +479,14 @@ def save_routine():
 @login_required
 def product_detail(product_id):
     """Show detailed product information"""
-    # Get product info
+    # Get product info from database by product_id
     product = db.execute("SELECT * FROM products WHERE id = ?", product_id)
     
     if not product:
         flash("Product not found", "error")
         return redirect("/search")
     
-    # Get ingredients
+    # Get ingredients for the product from database by joining ingredients and product_ingredients tables on ingredient_id and filtering by product_id
     ingredients = db.execute("""
         SELECT i.name
         FROM ingredients i
@@ -466,24 +495,30 @@ def product_detail(product_id):
         ORDER BY i.name
     """, product_id)
     
-    # Check if favorited
+    # Check if favorited by user already
     is_favorite = db.execute(
         "SELECT * FROM favorites WHERE user_id = ? AND product_id = ?",
         session["user_id"], product_id
     )
     
-    # Get user's skin type for ingredient analysis
+    # Get user's skin type for ingredient analysis from users table by user_id
     user = db.execute("SELECT skintype FROM users WHERE user_id = ?", session["user_id"])
+    # Default to "Combination" if not set for safety
     skin_type = user[0]["skintype"] if user else "Combination"
     
-    # Analyze ingredients
+    # Analyze ingredients for good/bad based on skin type from ingredient list
+
+    # Extract ingredient names into a simple list for easier checking
     ingredient_names = [ing["name"] for ing in ingredients]
     
+    # Determine good and bad ingredients based on skin type dictionaries
+    # If specific skin_type key is not found in the dictionary, .get() safely returns an empty list ([]) instead of throwing an error
     good_ings = [ing for ing in ingredient_names 
                 if ing in good_ingredients_by_skin_type.get(skin_type, [])]
     bad_ings = [ing for ing in ingredient_names 
                if ing in bad_ingredients_by_skin_type.get(skin_type, [])]
     
+    # Render product detail template with all info gathered
     return render_template("product_detail.html", 
                          product=product[0],
                          ingredients=ingredient_names,
@@ -496,7 +531,7 @@ def product_detail(product_id):
 def resources():
     """Show educational skincare resources"""
     
-    # Curated list of high-quality skincare resources
+    # Curated list of high-quality skincare resources by category
     resources = {
         "reddit": [
             {
