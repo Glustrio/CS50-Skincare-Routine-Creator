@@ -4,10 +4,13 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import login_required, product_has_bad_ingredient, get_good_matches, product_has_fragrance, good_ingredients_by_skin_type, bad_ingredients_by_skin_type
+from helpers import login_required, usd, product_has_bad_ingredient, get_good_matches, product_has_fragrance, good_ingredients_by_skin_type, bad_ingredients_by_skin_type
 
 # Configure application
 app = Flask(__name__)
+
+# Custom filter
+app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False

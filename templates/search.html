@@ -92,7 +92,7 @@
                                         <td>
                                             <span class="badge bg-info">{{ product.product_type }}</span>
                                         </td>
-                                        <td>${{ "%.2f"|format(product.price_usd) }}</td>
+                                        <td>${{ product.price_usd | usd }}</td>
                                         <td>
                                             <form action="/favorites" method="Post" style="display: inline;">
                                                 <input type="hidden" name="product_id" value="{{ product.id }}">

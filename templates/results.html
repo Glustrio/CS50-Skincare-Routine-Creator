@@ -22,7 +22,7 @@
                             <strong>{{ step|capitalize }}:</strong>
                             {% if product %}
                                 <div>{{ product.brand }} – {{ product.name }}</div>
-                                {% if product.price %}<div class="text-muted small">~ ${{ "%.2f"|format(product.price) }}</div>{% endif %}
+                                {% if product.price %}<div class="text-muted small">~ ${{ product.price | usd }}</div>{% endif %}
                                 {% if product.url %}<a href="{{ product.url }}" target="_blank" class="small">View online</a>{% endif %}
                             {% else %}
                                 <span class="text-muted">No match found for this step.</span>
@@ -43,7 +43,7 @@
                             <strong>{{ step|capitalize }}:</strong>
                             {% if product %}
                                 <div>{{ product.brand }} – {{ product.name }}</div>
-                                {% if product.price %}<div class="text-muted small">~ ${{ "%.2f"|format(product.price) }}</div>{% endif %}
+                                {% if product.price %}<div class="text-muted small">~ ${{ product.price | usd }}</div>{% endif %}
                                 {% if product.url %}<a href="{{ product.url }}" target="_blank" class="small">View online</a>{% endif %}
                             {% else %}
                                 <span class="text-muted">No match found for this step.</span>

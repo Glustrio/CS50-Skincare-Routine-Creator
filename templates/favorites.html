@@ -10,8 +10,8 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <h1 class="h3 mb-2">❤️ My Favorite Products</h1>
-                    <p class="text-muted">Products you like and want to favorite just becuz 😍</p>
+                    <h1 class="h3 mb-2">❤️ Your Favorite Products</h1>
+                    <p class="text-muted">Products you like and want to favorite just becuz</p>
                 </div>
             </div>
         </div>
@@ -28,7 +28,7 @@
                             <form action="/favorites" method="post" style="display: inline;">
                                 <input type="hidden" name="product_id" value="{{ product.id }}">
                                 <input type="hidden" name="action" value="remove">
-                                <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                                <button type="submit" class="btn btn-sm btn-link text-danger p-0" style="text-decoration: none;">
                                     ❌
                                 </button>
                             </form>
@@ -41,7 +41,7 @@
                         </h5>
                         
                         <p class="card-text">
-                            <strong class="text-primary">${{ "%.2f"|format(product.price_usd) }}</strong>
+                            <strong class="text-primary">${{ product.price_usd | usd }}</strong>
                         </p>
                         
                         <div class="d-grid gap-2">
@@ -67,11 +67,10 @@
                     <div class="card-body text-center">
                         <p class="mb-0">
                             <!-- Total favorites (length of favorites) -->
-                            <strong>Total Favorites:</strong> {{ favorites|length }} products
+                            <strong>Total Favorites:</strong> {{ favorites | length }} products
                             <br>
-                            <!-- Total value (sum of price_usd) -->
-                             <!-- Personal Note: favorites|sum(attribute='price_usd') takes the sum of price_usd of favorites (which is a list of dictioinaries) -->
-                            <strong>Total Value:</strong> ${{ "%.2f"|format(favorites|sum(attribute='price_usd')) }}
+                             <!-- favorites|sum(attribute='price_usd') takes the sum of price_usd of favorites (which is a list of dictioinaries) -->
+                            <strong>Total Value:</strong> ${{ favorites | sum(attribute='price_usd') | usd}}
                         </p>
                     </div>
                 </div>

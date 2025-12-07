@@ -14,10 +14,6 @@
                     Answer a few questions and we’ll suggest a simple morning and evening routine.
                 </p>
 
-                {% if error %}
-                    <div class="alert alert-danger">{{ error }}</div>
-                {% endif %}
-
                 <form action="/routine" method="post">
                     <!-- Skin Type -->
                     <div class="mb-3">

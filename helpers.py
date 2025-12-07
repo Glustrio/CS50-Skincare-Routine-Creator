@@ -20,7 +20,7 @@ def login_required(f):
 
 def usd(value):
     """Format value as USD."""
-    return f"${value:,.2f}"
+    return f"{value:,.2f}"
 
 
 def product_has_bad_ingredient(row, skin_type):

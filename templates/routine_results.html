@@ -15,7 +15,7 @@
                     <p class="text-muted">
                         For <strong>{{ skin_type }}</strong> skin
                         {% if concerns %}
-                            targeting: <strong>{{ concerns|join(', ') }}</strong>
+                            targeting: <strong>{{ concerns | join(', ') }}</strong>
                         {% endif %}
                     </p>
                 </div>
@@ -36,14 +36,18 @@
                             <ol class="list-group list-group-numbered">
                                 {% for product in routine.morning %}
                                 <li class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="ms-2 me-auto">
+                                    <div class="mx-auto">
+                                        <div class="ms-2 mx-auto">
                                             <div class="fw-bold">
                                                 <a href="/product/{{ product.id }}" class="text-decoration-none">
                                                     {{ product.product_name }}
                                                 </a>
                                             </div>
                                             <small class="text-muted">{{ product.product_type }}</small>
+                                            <br>
+                                            <span class="badge bg-primary rounded-pill">
+                                                ${{ product.price_usd | usd}}
+                                            </span>
                                             <br>
                                             <small class="text-success">
                                                 Match: {{ product.match_score }} points
@@ -53,9 +57,7 @@
                                             </small>
                                             <input type="hidden" name="product_ids" value="{{ product.id }}">
                                         </div>
-                                        <span class="badge bg-primary rounded-pill">
-                                            ${{ "%.2f"|format(product.price_usd) }}
-                                        </span>
+                                        
                                     </div>
                                 </li>
                                 {% endfor %}
@@ -80,14 +82,18 @@
                             <ol class="list-group list-group-numbered">
                                 {% for product in routine.evening %}
                                 <li class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="ms-2 me-auto">
+                                    <div class="mx-auto">
+                                        <div class="ms-2 mx-auto">
                                             <div class="fw-bold">
                                                 <a href="/product/{{ product.id }}" class="text-decoration-none">
                                                     {{ product.product_name }}
                                                 </a>
                                             </div>
                                             <small class="text-muted">{{ product.product_type }}</small>
+                                            <br>
+                                            <span class="badge bg-primary rounded-pill">
+                                                ${{ product.price_usd | usd }}
+                                            </span>
                                             <br>
                                             <small class="text-success">
                                                 Match: {{ product.match_score }} points
@@ -97,9 +103,7 @@
                                             </small>
                                             <input type="hidden" name="product_ids" value="{{ product.id }}">
                                         </div>
-                                        <span class="badge bg-primary rounded-pill">
-                                            ${{ "%.2f"|format(product.price_usd) }}
-                                        </span>
+                                        
                                     </div>
                                 </li>
                                 {% endfor %}

@@ -56,7 +56,7 @@
                                             </a>
                                         </td>
                                         <td><span class="badge bg-info">{{ product.product_type }}</span></td>
-                                        <td>${{ "%.2f"|format(product.price_usd) }}</td>
+                                        <td>${{ product.price_usd | usd }}</td>
                                         <td>
                                             {% if product.product_url %}
                                                 <a href="{{ product.product_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
@@ -80,7 +80,6 @@
         </div>
     </div>
 
-    <!-- Quick Stats -->
     <div class="row">
         <!-- Favorites Preview -->
         <div class="col-md-6 mb-4">
@@ -94,9 +93,9 @@
                             {% for fav in favorites %}
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 <a href="/product/{{ fav.product_id }}" class="text-decoration-none">
-                                    {{ fav.product_name[:40] }}{% if fav.product_name|length > 40 %}...{% endif %}
+                                    {{ fav.product_name[:40] }}{% if fav.product_name | length > 40 %}...{% endif %}
                                 </a>
-                                <span class="badge bg-secondary">${{ "%.2f"|format(fav.price_usd) }}</span>
+                                <span class="badge bg-secondary">${{ fav.price_usd | usd }}</span>
                             </li>
                             {% endfor %}
                         </ul>
