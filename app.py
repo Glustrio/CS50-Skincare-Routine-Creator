@@ -17,7 +17,7 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///skincare.db")
 
-
+# So page doesn't cache things weird when logging in/out
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
@@ -39,7 +39,6 @@ def index():
     user = db.execute("SELECT username, skintype FROM users WHERE user_id = ?", user_id)
     
     # Get user's saved routine products (if any) (start using """ for multi-line query and readability")
-    # (use p. and r. aliases for products and routine tables)
     routine_products = db.execute("""
         SELECT products.id AS product_id, products.product_name, products.product_type, products.price_usd, products.product_url
         FROM products
@@ -47,8 +46,8 @@ def index():
         WHERE routine.user_id = ?
     """, user_id)
     
-    # Get user's favorite products
-    favorites = db.execute("""
+    # Get user's top 5 favorite products
+    favorite_products = db.execute("""
         SELECT products.id AS product_id, products.product_name, products.product_type, products.price_usd
         FROM products
         JOIN favorites ON products.id = favorites.product_id
@@ -56,19 +55,20 @@ def index():
         LIMIT 5
     """, user_id)
     
+    # Render the dashboard template with user info, routine, and favorites
     return render_template("index.html", 
                          user=user[0] if user else None,
                          routine=routine_products,
-                         favorites=favorites)
-
-
-
+                         favorites=favorite_products)
 
 @app.route("/search", methods=["GET", "POST"])
 @login_required
 def search():
     """Search for specific products"""
+
+    # Handle search form submission
     if request.method == "POST":
+        # Get form inputs
         query = request.form.get("query", "").strip()
         product_type = request.form.get("product_type", "")
         max_price = request.form.get("max_price", "")
