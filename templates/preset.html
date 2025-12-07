@@ -11,7 +11,7 @@
             <div class="card-body">
                 <h1 class="h4 mb-3 text-center">Build Your Skincare Routine</h1>
                 <p class="text-muted text-center mb-4">
-                    Answer a few questions and we’ll suggest a simple morning and evening routine.
+                    Answer a few questions and we'll suggest a simple morning and evening routine.
                 </p>
 
                 {% if error %}
@@ -53,6 +53,21 @@
                             <input class="form-check-input" type="checkbox" name="concerns" value="anti-aging" id="anti-aging">
                             <label class="form-check-label" for="anti-aging">Fine lines / anti-aging</label>
                         </div>
+                    </div>
+
+                    <!-- NEW: Budget Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Budget (optional)</label>
+                        <select class="form-select" name="max_price_per_product">
+                            <option value="">No limit</option>
+                            <option value="15">Under $15 per product (Budget-friendly)</option>
+                            <option value="30">Under $30 per product (Mid-range)</option>
+                            <option value="50">Under $50 per product (Premium)</option>
+                            <option value="100">Under $100 per product (Luxury)</option>
+                        </select>
+                        <small class="form-text text-muted">
+                            This limits the price of individual products, not the total routine cost.
+                        </small>
                     </div>
 
                     <!-- Preferences -->

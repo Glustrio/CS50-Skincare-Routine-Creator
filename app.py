@@ -40,7 +40,7 @@ def index():
     
     # Get user's saved routine products (""" for multi-line string thingy)
     routine_products = db.execute("""
-        SELECT products.id AS product_id, products.product_name, products.product_type, products.price_usd, products.product_url
+        SELECT products.id, products.product_name, products.product_type, products.price_usd, products.product_url
         FROM products
         JOIN routine ON products.id = routine.product_id
         WHERE routine.user_id = ?
@@ -57,6 +57,7 @@ def index():
     
     # Render the dashboard template with user info, routine, and favorites
     return render_template("index.html", 
+                        # user is a list of dicts, so get first element if exists
                          user=user[0] if user else None,
                          routine=routine_products,
                          favorites=favorite_products)
@@ -69,7 +70,10 @@ def search():
     # Handle search form submission
     if request.method == "POST":
         # Get form inputs
-        query = request.form.get("query", "").strip() # Remove whitespace
+
+        # .strip() to remove leading/trailing whitespace
+        # If no input, default to empty string
+        query = request.form.get("query", "").strip()
         product_type = request.form.get("product_type", "")
         max_price = request.form.get("max_price", "")
         
@@ -77,28 +81,33 @@ def search():
             flash("Please enter a search term or select a product type", "error")
             return render_template("search.html")
         
-        # Build SQL query
-        # Super neat trick by saying WHERE 1=1 (since it's always true)
-        # Lets us append as many additional parameters as we'd like (mantains correct order too)
-        sql = "SELECT * FROM products WHERE 1=1"
-        params = []
+        # Build SQL query by selecting everything from all products from products table
+        sql = "SELECT * FROM products WHERE 67=67"
+        # Empty list to hold query parameters by appending onto it
+        parameters = []
         
         if query:
+            # Add condition for product name search to SQL query
             sql += " AND product_name LIKE ?"
-            params.append(f"%{query}%")
+            parameters.append(f"%{query}%")
         
         if product_type:
+            # Add condition for product type filter to SQL query
             sql += " AND product_type = ?"
-            params.append(product_type)
+            parameters.append(product_type)
         
         if max_price:
+            # Add condition for max price filter to SQL query
             sql += " AND price_usd <= ?"
-            params.append(float(max_price))
+            parameters.append(float(max_price))
         
+        # Limit results to 50 to avoid overwhelming the user
         sql += " LIMIT 50"
         
-        results = db.execute(sql, *params)
+        # Execute the newly constructed SQL query (made from sql +=) with every element inside the list named parameters
+        results = db.execute(sql, *parameters)
         
+        # Render the search results template with results and query
         return render_template("search.html", results=results, query=query)
     # GET - show search form
     product_types = db.execute("SELECT DISTINCT product_type FROM products ORDER BY product_type")
@@ -301,7 +310,7 @@ def filter_products(products, skin_type, concerns, fragrance_free):
     return filtered
 
 
-def build_routine(products):
+def build_routine(products, concerns):  # <-- Add 'concerns' parameter
     """Build a complete AM/PM routine from filtered products"""
     
     # Define product types needed for each routine
@@ -347,8 +356,9 @@ def routine():
     """Generate personalized skincare routine"""
     if request.method == "POST":
         skin_type = request.form.get("skin_type")
-        concerns = request.form.getlist("concerns")  # Multiple checkboxes
+        concerns = request.form.getlist("concerns")
         fragrance_free = request.form.get("fragrance_free")
+        max_price_per_product = request.form.get("max_price_per_product")
         
         # Validation
         if not skin_type:
@@ -376,21 +386,37 @@ def routine():
         # Convert ingredients string back to list for each product
         for product in products:
             if product["ingredients"]:
-                product["clean_ingreds"] = [ing.strip().lower() for ing in product["ingredients"].split(",")]
+                product["clean_ingreds"] = [ing.strip().lower() 
+                                           for ing in product["ingredients"].split(",")]
             else:
                 product["clean_ingreds"] = []
+        
+        # NEW: Filter by price BEFORE other filtering
+        if max_price_per_product:
+            max_price = float(max_price_per_product)
+            products = [p for p in products if p["price_usd"] <= max_price]
         
         # Filter products based on criteria
         recommended = filter_products(products, skin_type.capitalize(), 
                                      concerns, fragrance_free)
         
         # Build routine structure
-        routine = build_routine(recommended)
+        routine = build_routine(recommended, concerns)
+        
+        # NEW: Calculate total cost
+        total_cost = 0
+        for product in routine["morning"]:
+            total_cost += product["price_usd"]
+        for product in routine["evening"]:
+            # Don't double-count products used in both routines
+            if product not in routine["morning"]:
+                total_cost += product["price_usd"]
         
         return render_template("routine_results.html", 
                              routine=routine, 
                              skin_type=skin_type,
-                             concerns=concerns)
+                             concerns=concerns,
+                             total_cost=total_cost)  # NEW
     
     # GET request - show the form
     return redirect("/preset")
