@@ -11,7 +11,7 @@ data_dir = Path(kagglehub.dataset_download("eward96/skincare-products-clean-data
 
 csv_path = data_dir / "skincare_products_clean.csv"
 
-# Load dataset into DataFrame for analysis/modification
+# Load dataset
 df = pd.read_csv(csv_path)
 
 print("Shape:", df.shape)
@@ -20,7 +20,7 @@ print(df.head())
 
 exchange_rate = 1.32  # 1 GBP = 1.32 USD
 
-# First, clean the price column: remove currency symbol and convert to float
+# First clean the price column: remove currency symbol and convert to float
 df["price_usd"] = (
     df["price"]
       .astype(str)
@@ -38,7 +38,7 @@ df = df.drop(columns=["price"])
 all_ingredients = (
     df["clean_ingreds"]
     .dropna()                     # remove missing values
-    .apply(lambda x: eval(x) if isinstance(x, str) else x)  # convert string → list if needed
+    .apply(lambda x: eval(x) if isinstance(x, str) else x)  # convert string to list if needed
     .explode()                    # flatten lists into rows
     .str.strip()                  # remove whitespace
     .str.lower()                  # normalize casing

@@ -4,7 +4,7 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, usd, product_has_bad_ingredient, get_good_matches, product_has_fragrance, good_ingredients_by_skin_type, bad_ingredients_by_skin_type
+from helpers import login_required, product_has_bad_ingredient, get_good_matches, product_has_fragrance, good_ingredients_by_skin_type, bad_ingredients_by_skin_type
 
 # Configure application
 app = Flask(__name__)
@@ -38,7 +38,7 @@ def index():
     # Get user's skin type and username
     user = db.execute("SELECT username, skintype FROM users WHERE user_id = ?", user_id)
     
-    # Get user's saved routine products (if any) (start using """ for multi-line query and readability")
+    # Get user's saved routine products (""" for multi-line string thingy)
     routine_products = db.execute("""
         SELECT products.id AS product_id, products.product_name, products.product_type, products.price_usd, products.product_url
         FROM products
@@ -69,7 +69,7 @@ def search():
     # Handle search form submission
     if request.method == "POST":
         # Get form inputs
-        query = request.form.get("query", "").strip()
+        query = request.form.get("query", "").strip() # Remove whitespace
         product_type = request.form.get("product_type", "")
         max_price = request.form.get("max_price", "")
         
@@ -78,6 +78,8 @@ def search():
             return render_template("search.html")
         
         # Build SQL query
+        # Super neat trick by saying WHERE 1=1 (since it's always true)
+        # Lets us append as many additional parameters as we'd like (mantains correct order too)
         sql = "SELECT * FROM products WHERE 1=1"
         params = []
         
@@ -98,7 +100,6 @@ def search():
         results = db.execute(sql, *params)
         
         return render_template("search.html", results=results, query=query)
-    
     # GET - show search form
     product_types = db.execute("SELECT DISTINCT product_type FROM products ORDER BY product_type")
     return render_template("search.html", product_types=product_types)
@@ -189,9 +190,7 @@ def register():
             return render_template("register.html")     
 
         # Query database for username
-        rows = db.execute(
-            "SELECT * FROM users WHERE username = ?", request.form.get("username")
-        )
+        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
 
         # Ensure username does not exist
         if len(rows) != 0:
@@ -302,7 +301,7 @@ def filter_products(products, skin_type, concerns, fragrance_free):
     return filtered
 
 
-def build_routine(products, concerns):
+def build_routine(products):
     """Build a complete AM/PM routine from filtered products"""
     
     # Define product types needed for each routine
@@ -377,8 +376,7 @@ def routine():
         # Convert ingredients string back to list for each product
         for product in products:
             if product["ingredients"]:
-                product["clean_ingreds"] = [ing.strip().lower() 
-                                           for ing in product["ingredients"].split(",")]
+                product["clean_ingreds"] = [ing.strip().lower() for ing in product["ingredients"].split(",")]
             else:
                 product["clean_ingreds"] = []
         
@@ -387,7 +385,7 @@ def routine():
                                      concerns, fragrance_free)
         
         # Build routine structure
-        routine = build_routine(recommended, concerns)
+        routine = build_routine(recommended)
         
         return render_template("routine_results.html", 
                              routine=routine, 
@@ -419,7 +417,7 @@ def save_routine():
     flash("Routine saved successfully!")
     return redirect("/")
 
-@app.route("/product/<int:product_id>")
+@app.route("/product/<int:product_id>") # Makes product_id an int
 @login_required
 def product_detail(product_id):
     """Show detailed product information"""
