@@ -6,7 +6,7 @@ GlowGuide is a Flask web application that helps users create personaized skincar
 ## Installation Guide:
 
 The project folder should include the following files and structure:
-'''
+```
 .
 ├── app.py
 ├── helpers.py
@@ -28,15 +28,15 @@ The project folder should include the following files and structure:
 ├──requirements.txt
 ├── DESIGN.md
 └── README.md
-'''
+```
 
 Install the required dependencies by running in the terminal:
-'pip install -r requirements.txt'
+`pip install -r requirements.txt`
 
 To run the application, from the terminal:
 1. Navigate to your project folder
-2. Set Flask environment variable with 'export FLASK_APP=app.py'
-3. Start the web server with 'flask run'
+2. Set Flask environment variable with `export FLASK_APP=app.py`
+3. Start the web server with `flask run`
 4. Open the provided URL 
 5. Enjoy :D
 
